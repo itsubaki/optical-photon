@@ -134,12 +134,11 @@
         </div>
       </details>
     </div>
-    <p class="note"><strong>Physical limitations:</strong> Nielsen &amp; Chuang (§7.4.3) identify
-      weak single-photon Kerr interactions and the absorption accompanying a large nonlinear phase shift as major
-      drawbacks of this scheme. They also discuss the difficulty of stabilizing the many coupled interferometers
-      needed for a large quantum computation. This simulator assumes an ideal Kerr interaction, including the π
-      phase shift required for CNOT, to illustrate the gate mechanism; it is not a practical, general-purpose
-      quantum computer.</p>
+    <p class="note"><strong>Model scope:</strong> This simulator models single-photon Mach–Zehnder interference and
+      a two-photon CNOT built from ideal optical elements and a conditional Kerr phase, following §7.4. Inputs are
+      supplied as prepared pure states, with ideal mode matching, beam splitters, and phase control. Photon loss,
+      distinguishability, phase noise, absorption, and detector imperfections are not included. The Kerr phase,
+      including the π shift required for CNOT, is a model parameter rather than a prediction for a physical medium.</p>
   </main>
   <script type="module" src="./app.js"></script>
 </body>
