@@ -1,41 +1,104 @@
 import { simulate, abs2, fidelity, concurrence, TAU } from './optics.js';
 
 const $ = id => document.getElementById(id);
+
 const inputs = {
-  cnot: [['plus0', '|+0⟩\u2002Superposition'], ['10', '|10⟩\u2002Observe the bit flip'], ['11', '|11⟩\u2002Observe the reverse flip'], ['00', '|00⟩\u2002Unchanged'], ['01', '|01⟩\u2002Unchanged'], ['plus1', '|+1⟩\u2002Superposition'], ['uniform', '|++⟩\u2002Equal superposition']],
-  mzi: [['0', '|0⟩\u2002Upper rail'], ['1', '|1⟩\u2002Lower rail'], ['plus', '|+⟩\u2002In-phase superposition'], ['minus', '|−⟩\u2002Opposite-phase superposition']]
+  cnot: [
+    ['plus0', '|+0⟩\u2002Superposition'],
+    ['10', '|10⟩\u2002Observe the bit flip'],
+    ['11', '|11⟩\u2002Observe the reverse flip'],
+    ['00', '|00⟩\u2002Unchanged'],
+    ['01', '|01⟩\u2002Unchanged'],
+    ['plus1', '|+1⟩\u2002Superposition'],
+    ['uniform', '|++⟩\u2002Equal superposition']
+  ],
+  mzi: [
+    ['0', '|0⟩\u2002Upper rail'],
+    ['1', '|1⟩\u2002Lower rail'],
+    ['plus', '|+⟩\u2002In-phase superposition'],
+    ['minus', '|−⟩\u2002Opposite-phase superposition']
+  ]
 };
-const stageLabels = { cnot: ['Input', 'After the first H', 'After the Kerr interaction', 'Output'], mzi: ['Input', 'After the first BS', 'After the phase shifter', 'Output'] };
-const settings = { cnot: { input: 'plus0', phi: Math.PI }, mzi: { input: '0', phi: Math.PI / 2 } };
+
+const stageLabels = {
+  cnot: [
+    'Input',
+    'After the first H',
+    'After the Kerr interaction',
+    'Output'
+  ],
+  mzi: [
+    'Input',
+    'After the first BS',
+    'After the phase shifter',
+    'Output'
+  ]
+};
+
+const settings = {
+  cnot: {
+    input: 'plus0',
+    phi: Math.PI
+  },
+  mzi: {
+    input: '0',
+    phi: Math.PI / 2
+  }
+};
+
 let mode = 'cnot', theta = Math.PI / 4, stage = 3, snapshot;
 let playing = false, frame, previousTime = null;
 const clean = x => Math.abs(x) < 0.00005 ? 0 : x;
+
 function angleLabel(x) {
-  for (const [value, name] of [[0, '0'], [Math.PI / 4, 'π/4'], [Math.PI / 2, 'π/2'], [Math.PI, 'π'], [3 * Math.PI / 2, '3π/2'], [TAU, '2π']]) {
+  for (const [value, name] of [
+    [0, '0'],
+    [Math.PI / 4, 'π/4'],
+    [Math.PI / 2, 'π/2'],
+    [Math.PI, 'π'],
+    [3 * Math.PI / 2, '3π/2'],
+    [TAU, '2π']
+  ]) {
     if (Math.abs(x - value) < 1e-6) return `${name} rad`;
   }
+
   return `${(x / Math.PI).toFixed(3)}π rad`;
 }
+
 function complexLabel(a) {
   const re = clean(a[0]), im = clean(a[1]);
   if (!im) return re.toFixed(3);
   if (!re) return `${im.toFixed(3)}i`;
   return `${re.toFixed(3)}${im < 0 ? '−' : '+'}${Math.abs(im).toFixed(3)}i`;
 }
-const labels = () => mode === 'cnot' ? ['|00⟩', '|01⟩', '|10⟩', '|11⟩'] : ['|0⟩', '|1⟩'];
+
+const labels = () => mode === 'cnot' ? [
+  '|00⟩',
+  '|01⟩',
+  '|10⟩',
+  '|11⟩'
+] : [
+  '|0⟩',
+  '|1⟩'
+];
+
 function options() { return { mode, input: settings[mode].input, phi: settings[mode].phi, theta }; }
+
 function makeBars() {
   $('probability-bars').innerHTML = labels().map(label => `<div class="bar-item"><span class="ket">${label}</span><div class="bar-bg"><div class="bar-fill"></div></div><span class="val">—</span></div>`).join('');
 }
+
 function updateBars(probs) {
   [...$('probability-bars').children].forEach((row, i) => {
     row.querySelector('.bar-fill').style.width = `${Math.max(0, 100 * probs[i])}%`;
     row.querySelector('.val').textContent = `${(100 * probs[i]).toFixed(1)}%`;
   });
 }
+
 function drawCircuit() {
   const rail = (y, text, color = false) => `<text x="18" y="${y + 5}" class="svg-ket">${text}</text><line x1="86" y1="${y}" x2="560" y2="${y}" class="rail ${color ? 'active' : ''}"/><circle cx="570" cy="${y}" r="8" fill="#1c3044" stroke="#77b5e3"/>`;
   const mark = [96, 228, 374, 535][stage];
+
   let body;
   if (mode === 'cnot') {
     body = [rail(48, 'C : 0'), rail(94, 'C : 1'), rail(158, 'T : 1'), rail(204, 'T : 0')].join('') + `
@@ -50,22 +113,34 @@ function drawCircuit() {
       <rect x="426" y="68" width="56" height="134" rx="8" class="optical-box"/><text x="454" y="125" text-anchor="middle" class="svg-label">BS⁻¹</text><text x="454" y="148" text-anchor="middle" class="svg-small">−θ</text>
       <text x="317" y="246" text-anchor="middle" class="svg-small">Shift the phase in one rail, then recombine the two paths</text>`;
   }
+
   $('circuit').innerHTML = `<svg viewBox="0 0 600 268" role="img" aria-label="${mode === 'cnot' ? 'Four-rail optical CNOT circuit: H on the target, Kerr on the middle two rails, then H on the target.' : 'Two-rail interferometer: beam splitter, phase shifter on the lower rail, then inverse beam splitter.'} The green dashed line marks the observation point."><line x1="${mark}" x2="${mark}" y1="23" y2="224" stroke="#6bd9ad" stroke-dasharray="4 5" opacity=".65"/><circle cx="${mark}" cy="16" r="3" fill="#6bd9ad"/>${body}</svg>`;
 }
+
 function drawChart() {
   const canvas = $('chart'), ctx = canvas.getContext('2d');
   const dpr = Math.min(window.devicePixelRatio || 1, 2), w = canvas.clientWidth, h = canvas.clientHeight;
   canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr); ctx.scale(dpr, dpr);
+
   const left = 40, right = w - 14, top = 18, bottom = h - 31;
   const sx = x => left + x / TAU * (right - left), sy = y => bottom - y * (bottom - top);
   ctx.font = '10px system-ui'; ctx.lineWidth = 1;
+
   for (const y of [0, .25, .5, .75, 1]) {
     ctx.strokeStyle = '#24364c'; ctx.beginPath(); ctx.moveTo(left, sy(y)); ctx.lineTo(right, sy(y)); ctx.stroke();
     ctx.fillStyle = '#9bafc7'; ctx.textAlign = 'right'; ctx.fillText(`${y * 100}%`, left - 7, sy(y) + 3);
   }
-  for (const [x, label] of [[0, '0'], [Math.PI / 2, 'π/2'], [Math.PI, 'π'], [3 * Math.PI / 2, '3π/2'], [TAU, '2π']]) {
+
+  for (const [x, label] of [
+    [0, '0'],
+    [Math.PI / 2, 'π/2'],
+    [Math.PI, 'π'],
+    [3 * Math.PI / 2, '3π/2'],
+    [TAU, '2π']
+  ]) {
     ctx.fillStyle = '#9bafc7'; ctx.textAlign = 'center'; ctx.fillText(label, sx(x), bottom + 19);
   }
+
   const colors = ['#6bd9ad', '#6facfa'];
   for (let j = 0; j < 2; j++) {
     ctx.beginPath(); ctx.strokeStyle = colors[j]; ctx.lineWidth = 2;
@@ -74,14 +149,17 @@ function drawChart() {
       const y = mode === 'cnot' ? (j === 0 ? s.fidelity : s.probabilities[3]) : s.probabilities[j];
       if (i === 0) ctx.moveTo(sx(x), sy(y)); else ctx.lineTo(sx(x), sy(y));
     }
+
     ctx.stroke();
   }
+
   const phi = settings[mode].phi;
   ctx.strokeStyle = '#b59afa'; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
   ctx.beginPath(); ctx.moveTo(sx(phi), top); ctx.lineTo(sx(phi), bottom); ctx.stroke(); ctx.setLineDash([]);
   const values = mode === 'cnot' ? [snapshot.fidelity, snapshot.probabilities[3]] : snapshot.probabilities;
   values.forEach((y, i) => { ctx.fillStyle = colors[i]; ctx.beginPath(); ctx.arc(sx(phi), sy(y), 3.5, 0, TAU); ctx.fill(); });
 }
+
 function refresh() {
   try {
     snapshot = simulate(options());
@@ -100,10 +178,12 @@ function refresh() {
     updateBars(probs); drawCircuit(); drawChart(); $('error').textContent = '';
   } catch (error) { $('error').textContent = `Unable to display the simulation: ${error.message}`; }
 }
+
 function stop() {
   playing = false; previousTime = null; cancelAnimationFrame(frame);
   $('play').textContent = '▶ Sweep phase'; $('play').setAttribute('aria-pressed', 'false');
 }
+
 function setMode(next) {
   stop(); mode = next; stage = 3;
   document.querySelectorAll('[data-mode]').forEach(b => { b.setAttribute('aria-selected', String(b.dataset.mode === mode)); b.tabIndex = b.dataset.mode === mode ? 0 : -1; });
@@ -129,6 +209,7 @@ function setMode(next) {
   $('chart-note').textContent = `Final output as ${symbol} varies with the input fixed. This plot always shows the state after the last optical element, regardless of the selected observation point.`;
   makeBars(); refresh();
 }
+
 document.querySelectorAll('[data-mode]').forEach(b => {
   b.addEventListener('click', () => setMode(b.dataset.mode));
   b.addEventListener('keydown', e => {
@@ -137,16 +218,32 @@ document.querySelectorAll('[data-mode]').forEach(b => {
     setMode(next); $(`tab-${next}`).focus();
   });
 });
+
 $('input').addEventListener('change', () => { stop(); settings[mode].input = $('input').value; refresh(); });
 $('phase').addEventListener('input', () => { stop(); settings[mode].phi = Math.max(0, Math.min(TAU, Number($('phase').value))); refresh(); });
 $('theta').addEventListener('input', () => { stop(); theta = Math.max(0, Math.min(Math.PI / 2, Number($('theta').value))); refresh(); });
-for (const [id, value] of [['zero', 0], ['half', Math.PI / 2], ['pi', Math.PI]]) $(id).addEventListener('click', () => { stop(); settings[mode].phi = value; $('phase').value = value; refresh(); });
+
+for (const [id, value] of [
+  ['zero', 0],
+  ['half', Math.PI / 2],
+  ['pi', Math.PI]
+]) $(id).addEventListener('click', () => { stop(); settings[mode].phi = value; $('phase').value = value; refresh(); });
+
 document.querySelectorAll('[data-stage]').forEach(b => b.addEventListener('click', () => { stop(); stage = Number(b.dataset.stage); refresh(); }));
+
 $('reset').addEventListener('click', () => {
-  settings[mode] = mode === 'cnot' ? { input: 'plus0', phi: Math.PI } : { input: '0', phi: Math.PI / 2 };
+  settings[mode] = mode === 'cnot' ? {
+    input: 'plus0',
+    phi: Math.PI
+  } : {
+    input: '0',
+    phi: Math.PI / 2
+  };
+
   if (mode === 'mzi') { theta = Math.PI / 4; $('theta').value = theta; }
   setMode(mode);
 });
+
 $('play').addEventListener('click', () => {
   if (playing) { stop(); return; }
   playing = true; previousTime = null;
@@ -156,8 +253,10 @@ $('play').addEventListener('click', () => {
     if (previousTime !== null) settings[mode].phi = (settings[mode].phi + Math.min(100, time - previousTime) * TAU / 12000) % TAU;
     previousTime = time; $('phase').value = settings[mode].phi; refresh(); frame = requestAnimationFrame(tick);
   };
+
   frame = requestAnimationFrame(tick);
 });
+
 document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); });
 window.addEventListener('resize', () => { if (snapshot) drawChart(); });
 setMode('cnot');

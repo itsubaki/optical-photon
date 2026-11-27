@@ -16,37 +16,64 @@
   <main>
     <div class="eyebrow">NIELSEN-CHUANG; QUANTUM COMPUTATION AND QUANTUM INFORMATION §7.4</div>
     <h1>Optical Photon Simulator for Quantum Computation</h1>
-    <p class="intro">Encode quantum information in a photon’s <strong>path and phase</strong>. Explore how beam-splitter
-      interference and conditional phase shifts in a Kerr medium work together to implement quantum gates.</p>
+    <p class="intro">
+      Encode quantum information in a photon’s <strong>path and phase</strong>. Explore how beam-splitter
+      interference and conditional phase shifts in a Kerr medium work together to implement quantum gates.
+    </p>
 
     <div class="mode-switch" role="tablist" aria-label="Choose an experiment">
-      <button id="tab-cnot" role="tab" aria-selected="true" aria-controls="experiment" tabindex="0"
-        data-mode="cnot"><span>01</span> Two-photon CNOT <small>Kerr interaction</small></button>
-      <button id="tab-mzi" role="tab" aria-selected="false" aria-controls="experiment" tabindex="-1"
-        data-mode="mzi"><span>02</span> Single-photon interference <small>Mach–Zehnder</small></button>
+      <button id="tab-cnot" role="tab" aria-selected="true" aria-controls="experiment" tabindex="0" data-mode="cnot">
+        <span>01</span>
+        Two-photon CNOT
+        <small>Kerr interaction</small>
+      </button>
+      <button id="tab-mzi" role="tab" aria-selected="false" aria-controls="experiment" tabindex="-1" data-mode="mzi">
+        <span>02</span>
+        Single-photon interference
+        <small>Mach–Zehnder</small>
+      </button>
     </div>
 
     <div id="experiment" role="tabpanel" aria-labelledby="tab-cnot">
       <div class="grid">
         <section class="panel control" aria-labelledby="settings-title">
           <div class="section-heading">
-            <h2 id="settings-title">Simulation Settings</h2><span class="badge">IDEAL MODEL</span>
+            <h2 id="settings-title">Simulation Settings</h2>
+            <span class="badge">IDEAL MODEL</span>
           </div>
-          <label for="input">Logical Input State<select id="input"></select></label>
+          <label for="input">
+            Logical Input State
+            <select id="input"></select>
+          </label>
           <div class="slider-group">
-            <label class="time" for="phase"><span id="phase-label">Kerr interaction ξ = χL</span><output
-                id="phase-value" for="phase">π</output></label>
+            <label class="time" for="phase">
+              <span id="phase-label">Kerr interaction ξ = χL</span>
+              <output id="phase-value" for="phase">π</output>
+            </label>
             <input id="phase" type="range" min="0" max="6.283185307179586" step="any" value="3.141592653589793">
-            <div class="time" aria-hidden="true"><span>0</span><span>π</span><span>2π</span></div>
+            <div class="time" aria-hidden="true">
+              <span>0</span>
+              <span>π</span>
+              <span>2π</span>
+            </div>
           </div>
           <div id="theta-control" class="slider-group" hidden>
-            <label class="time" for="theta"><span>BS mixing angle θ</span><output id="theta-value"
-                for="theta">π/4</output></label>
+            <label class="time" for="theta">
+              <span>BS mixing angle θ</span>
+              <output id="theta-value" for="theta">π/4</output>
+            </label>
             <input id="theta" type="range" min="0" max="1.5707963267948966" step="any" value="0.7853981633974483">
-            <div class="time" aria-hidden="true"><span>0</span><span>π/4 · 50:50</span><span>π/2</span></div>
+            <div class="time" aria-hidden="true">
+              <span>0</span>
+              <span>π/4 · 50:50</span>
+              <span>π/2</span>
+            </div>
           </div>
-          <div class="row presets"><button id="zero">ξ = 0</button><button id="half">ξ = π/2</button><button id="pi"
-              class="primary">ξ = π</button></div>
+          <div class="row presets">
+            <button id="zero">ξ = 0</button>
+            <button id="half">ξ = π/2</button>
+            <button id="pi" class="primary">ξ = π</button>
+          </div>
           <button id="play" aria-pressed="false">▶ Sweep phase</button>
           <button id="reset" class="text-button">Reset to defaults</button>
           <div class="math" id="encoding"></div>
@@ -56,25 +83,35 @@
 
         <section class="panel experiment-view" aria-labelledby="circuit-title">
           <div class="section-heading">
-            <h2 id="circuit-title">Optical Circuit</h2><span id="photon-badge" class="badge green">2 PHOTONS · 4
-              MODES</span>
+            <h2 id="circuit-title">Optical Circuit</h2>
+            <span id="photon-badge" class="badge green">2 PHOTONS · 4 MODES</span>
           </div>
           <div class="stats">
-            <div class="stat"><small id="stat1-label">State fidelity with ideal CNOT output</small><strong class="good"
-                id="stat1">—</strong></div>
-            <div class="stat"><small id="stat2-label">Entanglement · concurrence</small><strong id="stat2">—</strong>
+            <div class="stat">
+              <small id="stat1-label">State fidelity with ideal CNOT output</small>
+              <strong class="good" id="stat1">—</strong>
             </div>
-            <div class="stat"><small>Total photon number</small><strong id="photon-count">2</strong></div>
+            <div class="stat">
+              <small id="stat2-label">Entanglement · concurrence</small>
+              <strong id="stat2">—</strong>
+            </div>
+            <div class="stat">
+              <small>Total photon number</small>
+              <strong id="photon-count">2</strong>
+            </div>
           </div>
           <div class="circuit-wrap" id="circuit"></div>
           <div class="stages" role="group" aria-label="Choose an observation point">
-            <button data-stage="0" aria-pressed="false">Input</button><button data-stage="1" aria-pressed="false">After
-              H</button><button data-stage="2" aria-pressed="false">After Kerr</button><button data-stage="3"
-              aria-pressed="true">Output</button>
+            <button data-stage="0" aria-pressed="false">Input</button>
+            <button data-stage="1" aria-pressed="false">After H</button>
+            <button data-stage="2" aria-pressed="false">After Kerr</button>
+            <button data-stage="3" aria-pressed="true">Output</button>
           </div>
           <p class="muted circuit-caption" id="circuit-caption"></p>
-          <div class="state-heading"><span class="muted">State at observation point</span><span id="stage-name"
-              class="stage-label">Output</span></div>
+          <div class="state-heading">
+            <span class="muted">State at observation point</span>
+            <span id="stage-name" class="stage-label">Output</span>
+          </div>
           <div id="state-vector" class="state-vector" aria-label="State vector with complex amplitudes"></div>
         </section>
       </div>
@@ -83,12 +120,14 @@
         <section class="panel" aria-labelledby="prob-title">
           <h2 id="prob-title">Logical Qubit Measurement Probabilities</h2>
           <div id="probability-bars"></div>
-          <p id="prob-note" class="muted">Use the fidelity above to check agreement with the ideal logical CNOT output
-            at ξ = π.</p>
+          <p id="prob-note" class="muted">
+            Use the fidelity above to check agreement with the ideal logical CNOT output at ξ = π.
+          </p>
         </section>
         <section class="panel" aria-labelledby="sweep-title">
           <div class="section-heading">
-            <h2 id="sweep-title">Phase &amp; Interference</h2><span class="badge">FINAL OUTPUT</span>
+            <h2 id="sweep-title">Phase &amp; Interference</h2>
+            <span class="badge">FINAL OUTPUT</span>
           </div>
           <canvas id="chart" role="img"
             aria-label="Final-output probabilities and state fidelity as the phase varies from 0 to 2π"></canvas>
@@ -102,43 +141,64 @@
         <div class="theory-grid">
           <div>
             <h3>01 / Dual-rail encoding</h3>
-            <p>A single qubit uses |0⟩<sub>L</sub> = |01⟩ and |1⟩<sub>L</sub> = |10⟩. For two qubits, the control rails
+            <p>
+              A single qubit uses |0⟩<sub>L</sub> = |01⟩ and |1⟩<sub>L</sub> = |10⟩. For two qubits, the control rails
               are reversed to match the four-mode arrangement on p.294 of the textbook.</p>
-            <div class="formula">|00⟩ → |1001⟩ &nbsp; |01⟩ → |1010⟩<br>|10⟩ → |0101⟩ &nbsp; |11⟩ → |0110⟩</div>
+            <div class="formula">
+              |00⟩ → |1001⟩ &nbsp; |01⟩ → |1010⟩<br>
+              |10⟩ → |0101⟩ &nbsp; |11⟩ → |0110⟩
+            </div>
           </div>
           <div>
             <h3>02 / Beam splitter &amp; phase</h3>
-            <p>We use the explicit real matrix in Eq. (7.35) as our beam-splitter convention, with consistent signs
-              throughout.</p>
-            <div class="formula">B(θ) = [[cos θ, −sin θ], [sin θ, cos θ]]<br>P(φ) = diag(1,
-              e<sup>iφ</sup>)<br>U<sub>MZI</sub> = B(−θ) P(φ) B(θ)</div>
-            <p>θ = π/4 gives a 50:50 splitter. For input |0⟩, P(1) = sin²(2θ) sin²(φ/2). At φ = 0, the two beam
-              splitters cancel.</p>
+            <p>
+              We use the explicit real matrix in Eq. (7.35) as our beam-splitter convention, with consistent signs
+              throughout.
+            </p>
+            <div class="formula">
+              B(θ) = [[cos θ, −sin θ], [sin θ, cos θ]]<br>
+              P(φ) = diag(1, e<sup>iφ</sup>)<br>
+              U<sub>MZI</sub> = B(−θ) P(φ) B(θ)
+            </div>
+            <p>
+              θ = π/4 gives a 50:50 splitter. For input |0⟩, P(1) = sin²(2θ) sin²(φ/2). At φ = 0, the two beam splitters
+              cancel.
+            </p>
           </div>
           <div>
             <h3>03 / Kerr → CNOT</h3>
-            <p>Only the |11⟩ component, with a photon in each of the two middle modes, acquires a phase. H acts on the
-              target qubit.</p>
-            <div class="formula">K(ξ) = diag(1, 1, 1, e<sup>iξ</sup>)<br>U = (I ⊗ H) K(ξ) (I ⊗ H)<br>H = B(π/4) diag(1,
-              −1)</div>
+            <p>
+              Only the |11⟩ component, with a photon in each of the two middle modes, acquires a phase. H acts on the
+              target qubit.
+            </p>
+            <div class="formula">K(ξ) = diag(1, 1, 1, e<sup>iξ</sup>)<br>
+              U = (I ⊗ H) K(ξ) (I ⊗ H)<br>H = B(π/4) diag(1, −1)
+            </div>
             <p>At ξ = π, the circuit implements CNOT. Input |+0⟩ produces the Bell state (|00⟩ + |11⟩)/√2.</p>
           </div>
           <div>
             <h3>04 / Reading the state</h3>
-            <p>A component with complex amplitude a has measurement probability |a|². Fidelity F =
+            <p>
+              A component with complex amplitude a has measurement probability |a|². Fidelity F =
               |⟨ψ<sub>ideal</sub>|ψ⟩|² compares the state at the selected point with the ideal final output for this
-              input. It is not a gate fidelity.</p>
-            <p>For a pure two-qubit state a|00⟩ + b|01⟩ + c|10⟩ + d|11⟩, concurrence is C = 2|ad − bc|. A value of 0
-              means a product state; 1 means maximal entanglement.</p>
+              input. It is not a gate fidelity.
+            </p>
+            <p>
+              For a pure two-qubit state a|00⟩ + b|01⟩ + c|10⟩ + d|11⟩, concurrence is C = 2|ad − bc|. A value of 0
+              means a product state; 1 means maximal entanglement.
+            </p>
           </div>
         </div>
       </details>
     </div>
-    <p class="note"><strong>Model scope:</strong> This simulator models single-photon Mach–Zehnder interference and
+
+    <p class="note">
+      <strong>Model scope:</strong> This simulator models single-photon Mach–Zehnder interference and
       a two-photon CNOT built from ideal optical elements and a conditional Kerr phase, following §7.4. Inputs are
       supplied as prepared pure states, with ideal mode matching, beam splitters, and phase control. Photon loss,
       distinguishability, phase noise, absorption, and detector imperfections are not included. The Kerr phase,
-      including the π shift required for CNOT, is a model parameter rather than a prediction for a physical medium.</p>
+      including the π shift required for CNOT, is a model parameter rather than a prediction for a physical medium.
+    </p>
   </main>
   <script type="module" src="./app.js"></script>
 </body>
