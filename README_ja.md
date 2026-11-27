@@ -1,4 +1,4 @@
-# 光子による量子コンピュータ・シミュレータ
+# 光子による量子コンピュータ
 
 ビームスプリッター、位相シフター、理想的な非線形Kerr相互作用によってCNOTを実装する、HTML・CSS・JavaScriptで作成したデモです。
 ニールセン＆チャン『Quantum Computation and Quantum Information』7.4節で説明されているdual-rail符号化と光学ゲートを使用しています。
